@@ -9,13 +9,13 @@
    ════════════════════════════════════════════════════════════ */
 
 const firebaseConfig = {
-  apiKey:            "AIzaSyXXXXXXXXXXXXXXXXXXXXX",
-  authDomain:        "aep-prevent.firebaseapp.com",
-  projectId:         "aep-prevent",
-  storageBucket:     "aep-prevent.appspot.com",
-  messagingSenderId: "123456789012",
-  appId:             "1:123456789012:web:abc123def456"
-};
+  apiKey: "AIzaSyDnyaSfVX0oo_5eiWUdgXyZ5skGg9gnjqQ",
+  authDomain: "aep-prevent.firebaseapp.com",
+  projectId: "aep-prevent",
+  storageBucket: "aep-prevent.firebasestorage.app",
+  messagingSenderId: "295998191963",
+  appId: "1:295998191963:web:128a64e368856d70eb027e"
+};;
 
 /* ─── Inicialização (não precisa mexer daqui para baixo) ─── */
 (function(){
