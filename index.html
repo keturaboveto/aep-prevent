@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#1F3864">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="AEP NR-17">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>AEP NR-17 — Dr. Prevent SST</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+:root{
+  --navy:#1F3864;--blue:#185FA5;--blue-light:#E6F1FB;
+  --green-dark:#3B6D11;--green-light:#EAF3DE;
+  --amber:#854F0B;--amber-light:#FAEEDA;
+  --orange-dark:#5C2700;--orange-light:#F4B942;
+  --red-dark:#7D0000;--red-light:#F4665C;
+  --mod-dark:#5C3900;--mod-light:#FFD966;
+  --tol-dark:#7D4E00;--tol-light:#FFF2CC;
+  --triv-dark:#375623;--triv-light:#D5E8D4;
+  --bg:#F0F4FA;--surface:#FFFFFF;--surface2:#F2F4F7;
+  --border:#DDE2EA;--border2:#C8D0DC;
+  --text:#1A2332;--text2:#4A5568;--text3:#8A96A8;
+  --shadow:0 1px 4px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);
+  --radius:8px;--radius-lg:12px;
+  --font:'Nunito Sans',system-ui,sans-serif;
+  --font-sig:'Dancing Script',cursive;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px}
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:216px;min-width:216px;background:var(--navy);display:flex;flex-direction:column;transition:transform .25s ease}
+.sidebar-logo{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.1)}
+.logo-name{font-size:14px;font-weight:800;color:#fff}
+.logo-sub{font-size:10px;color:rgba(255,255,255,.45);margin-top:2px}
+.logo-user{font-size:11px;color:rgba(255,255,255,.6);margin-top:6px;display:flex;align-items:center;gap:5px}
+.nav-section{padding:14px 16px 4px;font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.8px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 16px;font-size:12px;color:rgba(255,255,255,.6);cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.nav-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav-item.active{background:rgba(255,255,255,.12);color:#fff;border-left-color:#4A90D9;font-weight:700}
+.nav-item i{font-size:15px;min-width:18px}
+.nav-badge{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.2);margin-left:auto;transition:background .3s}
+.nav-badge.done{background:#5DCAA5}
+.sidebar-footer{margin-top:auto;padding:12px 16px;border-top:1px solid rgba(255,255,255,.1)}
+.prog-label{font-size:9px;color:rgba(255,255,255,.4);margin-bottom:5px;display:flex;justify-content:space-between}
+.prog-bar{height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:#5DCAA5;border-radius:2px;transition:width .4s}
+.btn-sidebar-logout{width:100%;margin-top:8px;padding:6px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.12);border-radius:6px;font-size:11px;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s}
+.btn-sidebar-logout:hover{background:rgba(255,255,255,.14);color:#fff}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.topbar{padding:10px 20px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.menu-btn{display:none;background:none;border:none;cursor:pointer;color:var(--text2);padding:4px}
+.page-title{font-size:13px;font-weight:700;color:var(--navy)}
+.topbar-actions{display:flex;gap:7px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:var(--radius);border:1px solid var(--border2);font-size:11px;font-weight:700;cursor:pointer;background:var(--surface);color:var(--text2);transition:all .15s;font-family:var(--font);white-space:nowrap}
+.btn:hover{background:var(--surface2)}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn-primary:hover{background:#1a6bbf}
+.btn-success{background:var(--green-dark);color:#fff;border-color:var(--green-dark)}
+.btn-success:hover{opacity:.88}
+.btn-demo{background:var(--green-light);color:var(--green-dark);border-color:#C0DD97}
+.btn i{font-size:14px}
+.content{flex:1;overflow-y:auto;padding:18px 20px}
+.section{margin-bottom:20px}
+.section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.section-badge{background:var(--amber-light);color:var(--amber);padding:1px 7px;border-radius:20px;font-size:9px;font-weight:700;text-transform:none;letter-spacing:0}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+.field{display:flex;flex-direction:column;gap:3px}
+.field label{font-size:10px;font-weight:700;color:var(--text2)}
+.field input,.field select,.field textarea{font-size:11px;padding:6px 8px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--surface);color:var(--text);font-family:var(--font);outline:none;transition:border .15s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#378ADD;box-shadow:0 0 0 3px rgba(55,138,221,.1)}
+.field textarea{resize:vertical;min-height:56px;line-height:1.5}
+.ges-tabs{display:flex;gap:5px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.ges-tab{padding:3px 10px;border-radius:20px;border:1px solid var(--border2);font-size:11px;font-weight:600;cursor:pointer;background:var(--surface);color:var(--text2);transition:all .15s}
+.ges-tab:hover{border-color:#378ADD;color:var(--blue)}
+.ges-tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.ges-tab.add-tab{border-style:dashed;color:var(--text3)}
+.ges-tab.del-tab{color:#c0392b;border-color:#f5c6c6}
+.risk-table{width:100%;border-collapse:collapse;font-size:10px}
+.risk-table th{padding:6px 7px;text-align:left;background:#1F3864;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;border:0.5px solid #1F3864}
+.risk-table td{padding:4px 7px;border:0.5px solid var(--border);vertical-align:middle}
+.risk-table tbody tr:nth-child(even) td{background:var(--surface2)}
+.risk-table tbody tr:hover td{background:#EBF3FB}
+.cat-row td{background:#EEF2F8!important;font-weight:700;font-size:9px;text-transform:uppercase;letter-spacing:.4px;color:var(--navy)}
+.nr-badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:9px;font-weight:700;white-space:nowrap}
+.risco-row{cursor:pointer}
+.risco-row.aberto td{background:#f0f6ff!important}
+.detail-panel{background:#f8fafd;border-bottom:1px solid var(--border);padding:10px 12px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.detail-box{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:8px 10px}
+.detail-box-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);margin-bottom:4px;display:flex;align-items:center;gap:5px}
+.detail-box-body{font-size:10px;color:var(--text);line-height:1.6}
+.foto-drop{border:2px dashed var(--border2);border-radius:var(--radius-lg);padding:18px;text-align:center;cursor:pointer;color:var(--text3);transition:all .2s;background:var(--surface)}
+.foto-drop:hover{border-color:#378ADD;background:var(--blue-light);color:var(--blue)}
+.foto-drop i{font-size:24px;margin-bottom:5px;display:block}
+.fotos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;margin-top:10px}
+.foto-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;position:relative;box-shadow:var(--shadow)}
+.foto-card img{width:100%;height:105px;object-fit:cover;display:block}
+.foto-card-body{padding:7px}
+.foto-card-body label{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:3px}
+.foto-card-body input{width:100%;font-size:10px;font-weight:600;border:0.5px solid var(--border);border-radius:4px;padding:3px 5px;background:var(--surface2);color:var(--text);font-family:var(--font)}
+.foto-del{position:absolute;top:5px;right:5px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.maq-tag{display:inline-flex;align-items:center;gap:4px;background:var(--surface2);border:0.5px solid var(--border);border-radius:20px;padding:3px 9px 3px 11px;font-size:11px;font-weight:500;margin:2px}
+.maq-tag button{background:none;border:none;cursor:pointer;color:var(--text3);font-size:11px;padding:0;display:flex;align-items:center}
+.maq-tag button:hover{color:#c0392b}
+.ac-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:13px;margin-bottom:10px;box-shadow:var(--shadow)}
+.ac-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;gap:10px}
+.ac-form-2{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:7px}
+.ac-form-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:4px}
+.summary-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;text-align:center;box-shadow:var(--shadow)}
+.sc-label{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+.sc-value{font-size:24px;font-weight:800}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text3)}
+.empty-state i{font-size:36px;margin-bottom:10px;display:block;opacity:.5}
+.footer-bar{padding:8px 20px;background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.footer-info{font-size:10px;color:var(--text3)}
+.offline-banner{display:none;background:#854F0B;color:#fff;padding:7px 20px;font-size:11px;font-weight:700;text-align:center;align-items:center;gap:8px;justify-content:center}
+.offline-banner.show{display:flex}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100}
+/* RESPONSÁVEL */
+.resp-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
+.resp-card-title{font-size:11px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+/* ASSINATURA */
+.sig-area{border:2px dashed var(--border2);border-radius:var(--radius-lg);padding:20px;text-align:center;background:var(--surface2)}
+.sig-display{font-family:var(--font-sig);font-size:32px;color:var(--navy);min-height:52px;padding:8px;letter-spacing:1px;word-break:break-word}
+.sig-controls{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.sig-input{font-size:14px;padding:8px 12px;border:1.5px solid var(--border2);border-radius:var(--radius);width:100%;max-width:340px;font-family:var(--font);outline:none;margin-bottom:10px;text-align:center}
+.sig-input:focus{border-color:#378ADD}
+.sig-date{font-size:11px;color:var(--text3);margin-top:8px}
+.sig-preview-wrap{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-top:12px;display:inline-block;min-width:280px}
+.sig-preview-line{border-top:1.5px solid var(--navy);padding-top:6px;margin-top:4px;font-size:10px;color:var(--text2);text-align:center}
+/* TOAST */
+.toast{position:fixed;bottom:18px;right:18px;background:var(--navy);color:#fff;padding:11px 16px;border-radius:var(--radius-lg);font-size:12px;font-weight:700;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.2);animation:toastIn .3s ease;pointer-events:none;max-width:300px}
+.toast.ok{background:var(--green-dark)}
+.toast.err{background:#c0392b}
+@keyframes toastIn{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.chevron{display:inline-block;transition:transform .2s;font-size:11px}
+.chevron.open{transform:rotate(90deg)}
+@media(max-width:768px){
+  .sidebar{position:fixed;inset:0 auto 0 0;z-index:101;transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .overlay.show{display:block}
+  .menu-btn{display:flex}
+  .form-grid{grid-template-columns:1fr}
+  .form-grid-3{grid-template-columns:1fr 1fr}
+  .summary-grid{grid-template-columns:1fr 1fr}
+  .ac-form-3{grid-template-columns:1fr 1fr}
+  .content{padding:12px 14px}
+  .topbar{padding:9px 14px}
+  .footer-bar{padding:7px 14px}
+}
+@media(max-width:480px){
+  .form-grid-3{grid-template-columns:1fr}
+  .ac-form-2{grid-template-columns:1fr}
+  .ac-form-3{grid-template-columns:1fr}
+  .topbar-actions .btn span{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="offline-banner" id="offlineBanner">
+  <i class="ti ti-wifi-off"></i> Você está offline — o app continua funcionando normalmente
+</div>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div style="text-align:center;background:#000;border-radius:6px;padding:8px;margin-bottom:8px">
+        <img id="sidebarLogo" src="logo-prevent.png" alt="Dr. Prevent Saúde Ocupacional" style="width:100%;max-width:170px;height:auto">
+      </div>
+      <div class="logo-name" style="font-size:13px"><i class="ti ti-clipboard-heart"></i> AEP NR-17</div>
+      <div class="logo-sub">Avaliação Ergonômica Preliminar</div>
+      <div class="logo-user" id="sidebarUser"><i class="ti ti-user-circle"></i> <span></span></div>
+    </div>
+    <div class="nav-section">Seções</div>
+    <div class="nav-item active" id="nav-empresa" onclick="showPage('empresa')"><i class="ti ti-building"></i> Empresa <span class="nav-badge" id="badge-empresa"></span></div>
+    <div class="nav-item" id="nav-ges" onclick="showPage('ges')"><i class="ti ti-users"></i> GES / Avaliação <span class="nav-badge" id="badge-ges"></span></div>
+    <div class="nav-item" id="nav-cronograma" onclick="showPage('cronograma')"><i class="ti ti-calendar-event"></i> Planejamento Ações <span class="nav-badge" id="badge-cronograma"></span></div>
+    <div class="nav-item" id="nav-responsavel" onclick="showPage('responsavel')"><i class="ti ti-user-check"></i> Responsável <span class="nav-badge" id="badge-responsavel"></span></div>
+    <div style="flex:1"></div>
+    <div class="sidebar-footer">
+      <div class="prog-label"><span>Preenchimento</span><span id="progLabel">0/4</span></div>
+      <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+      <button class="btn-sidebar-logout" onclick="window.location.href='aeps.html'" style="margin-top:8px;background:rgba(255,255,255,.12);color:#fff"><i class="ti ti-arrow-left"></i> Voltar às AEPs</button>
+      <button class="btn-sidebar-logout" onclick="AEPAuth.logout()"><i class="ti ti-logout"></i> Sair do sistema</button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+        <button class="menu-btn btn" onclick="openSidebar()" aria-label="Menu"><i class="ti ti-menu-2"></i></button>
+        <div style="min-width:0;flex:1">
+          <div class="page-title" id="pageTitle">Identificação da empresa</div>
+          <div id="aepNameTopbar" style="font-size:10px;color:var(--text3);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-demo" onclick="preencherDemo()"><i class="ti ti-wand"></i> <span>Teste</span></button>
+        <button class="btn btn-success" onclick="showPage('responsavel')"><i class="ti ti-user-check"></i> <span>Assinar</span></button>
+        <button class="btn btn-primary" onclick="gerarDoc()"><i class="ti ti-file-download"></i> <span>Gerar Word</span></button>
+      </div>
+    </header>
+
+    <!-- EMPRESA -->
+    <div class="content" id="page-empresa">
+      <div class="section">
+        <div class="section-title">Dados da empresa</div>
+
+        <!-- Banner consulta CNPJ -->
+        <div id="cnpjBanner" style="display:none;border-radius:var(--radius-lg);padding:11px 13px;margin-bottom:12px;font-size:12px;gap:10px;line-height:1.5;align-items:flex-start"></div>
+
+        <div class="form-grid">
+          <div class="field" style="grid-column:span 2">
+            <label>CNPJ *
+              <span style="font-size:9px;color:var(--text3);font-weight:400">— digite os 14 dígitos para consulta automática na Receita Federal</span>
+            </label>
+            <div style="position:relative">
+              <input id="cnpj" placeholder="00.000.000/0001-00" oninput="maskCNPJ(this)" autocomplete="off" style="padding-right:36px">
+              <span id="cnpjStatusIcon" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none"></span>
+            </div>
+          </div>
+          <div class="field" style="grid-column:span 2"><label>Razão social *</label><input id="razaoSocial" placeholder="Nome da empresa" oninput="autoSave()"></div>
+          <div class="field"><label>Nome fantasia</label><input id="nomeFantasia" placeholder="Nome fantasia (se houver)" oninput="autoSave()"></div>
+          <div class="field"><label>CNAE principal</label><input id="cnae" placeholder="00.00-0/00 — descrição" oninput="autoSave()"></div>
+          <div class="field" style="grid-column:span 2"><label>Endereço</label><input id="endereco" placeholder="Logradouro, nº, bairro" oninput="autoSave()"></div>
+          <div class="field"><label>Município / UF</label><input id="municipio" placeholder="Cidade — SP" oninput="autoSave()"></div>
+          <div class="field"><label>CEP</label><input id="cep" placeholder="00000-000" oninput="autoSave()"></div>
+          <div class="field"><label>Grau de risco</label>
+            <select id="grauRisco" onchange="autoSave()">
+              <option value="">Selecione</option>
+              <option>Grau 1</option><option>Grau 2</option><option>Grau 3</option><option>Grau 4</option>
+            </select>
+          </div>
+          <div class="field"><label>Total de trabalhadores</label><input id="totalTrab" type="number" placeholder="0" oninput="autoSave()"></div>
+          <div class="field"><label>Data da avaliação</label><input id="dataAv" type="date" onchange="autoSave()"></div>
+        </div>
+      </div>
+
+      <!-- Horários e Turnos -->
+      <div class="section">
+        <div class="section-title">Horários de trabalho e turnos</div>
+        <div class="form-grid">
+          <div class="field"><label>Horário administrativo / normal</label><input id="horarioNormal" placeholder="Ex.: 08h00 às 18h00, com 1h de almoço" oninput="autoSave()"></div>
+          <div class="field"><label>Carga horária semanal</label><input id="cargaSemanal" placeholder="Ex.: 44h/semana" oninput="autoSave()"></div>
+          <div class="field" style="grid-column:span 2">
+            <label>Possui regime de turnos?</label>
+            <select id="possuiTurnos" onchange="toggleTurnos();autoSave()">
+              <option value="nao">Não — apenas horário administrativo</option>
+              <option value="sim">Sim — possui turnos de trabalho</option>
+            </select>
+          </div>
+        </div>
+        <div id="turnosWrap" style="display:none;margin-top:10px;padding:12px;background:var(--surface2);border-radius:var(--radius);border:1px solid var(--border)">
+          <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px">Horários dos turnos</div>
+          <div class="form-grid-3">
+            <div class="field"><label>1º turno (manhã)</label><input id="turno1" placeholder="Ex.: 06h às 14h" oninput="autoSave()"></div>
+            <div class="field"><label>2º turno (tarde)</label><input id="turno2" placeholder="Ex.: 14h às 22h" oninput="autoSave()"></div>
+            <div class="field"><label>3º turno (noite)</label><input id="turno3" placeholder="Ex.: 22h às 06h" oninput="autoSave()"></div>
+          </div>
+          <div style="margin-top:8px">
+            <div class="field"><label>Observações sobre os turnos</label><input id="turnosObs" placeholder="Ex.: revezamento semanal, escala 5x2, intervalos..." oninput="autoSave()"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Demanda / justificativa</div>
+        <div class="field"><textarea id="demanda" placeholder="Descreva a demanda ou justificativa que originou esta AEP..." style="min-height:76px" oninput="autoSave()"></textarea></div>
+      </div>
+    </div>
+
+    <!-- GES -->
+    <div class="content" id="page-ges" style="display:none">
+      <div class="ges-tabs" id="gesTabs"></div>
+      <div id="gesContent"></div>
+    </div>
+
+    <!-- CRONOGRAMA -->
+    <div class="content" id="page-cronograma" style="display:none">
+      <div id="cronoContent"></div>
+    </div>
+
+    <!-- RESPONSÁVEL — última aba -->
+    <div class="content" id="page-responsavel" style="display:none">
+
+      <!-- Técnico que realizou a visita -->
+      <div class="resp-card">
+        <div class="resp-card-title"><i class="ti ti-user-search"></i> Técnico responsável pela visita</div>
+        <div class="form-grid">
+          <div class="field"><label>Nome completo *</label><input id="respNome" placeholder="Nome do técnico" oninput="updateSigPreview();autoSave()"></div>
+          <div class="field"><label>Registro profissional</label><input id="respReg" placeholder="CREA / CRF / CRM..." oninput="autoSave()"></div>
+          <div class="field"><label>Cargo / função</label><input id="respCargo" placeholder="Ergonomista, Eng. de Segurança..." oninput="autoSave()"></div>
+          <div class="field"><label>Data da visita</label><input id="respData" type="date" onchange="updateSigPreview();autoSave()"></div>
+        </div>
+        <div style="margin-top:10px">
+          <div class="field"><label>Observações da visita</label><textarea id="respObs" placeholder="Condições gerais encontradas, metodologia aplicada, observações relevantes..." style="min-height:70px" oninput="autoSave()"></textarea></div>
+        </div>
+      </div>
+
+      <!-- Assinatura tipográfica -->
+      <div class="resp-card">
+        <div class="resp-card-title"><i class="ti ti-signature"></i> Assinatura digital</div>
+        <div class="sig-area">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Digite o nome para gerar a assinatura tipográfica</div>
+          <input class="sig-input" id="sigInput" placeholder="Digite o nome completo para assinar..."
+            oninput="updateSigPreview()" autocomplete="off">
+          <div class="sig-display" id="sigDisplay" style="min-height:52px"></div>
+          <div class="sig-date" id="sigDate"></div>
+          <div class="sig-preview-wrap" id="sigPreviewWrap" style="display:none">
+            <div class="sig-display" id="sigPreviewName" style="font-size:28px;margin-bottom:4px"></div>
+            <div class="sig-preview-line" id="sigPreviewLine"></div>
+          </div>
+          <div class="sig-controls">
+            <button class="btn btn-primary" onclick="confirmarAssinatura()"><i class="ti ti-check"></i> Confirmar assinatura</button>
+            <button class="btn" onclick="limparAssinatura()" style="background:#FFF0F0;color:#c0392b;border-color:#f5c6c6"><i class="ti ti-x"></i> Limpar</button>
+          </div>
+        </div>
+        <div id="sigConfirmado" style="display:none;margin-top:12px;padding:12px 14px;background:var(--green-light);border:1px solid #C0DD97;border-radius:var(--radius);font-size:12px;color:var(--green-dark);display:flex;align-items:center;gap:8px">
+          <i class="ti ti-circle-check" style="font-size:18px"></i>
+          <span id="sigConfirmadoTxt"></span>
+        </div>
+      </div>
+
+    </div>
+
+    <footer class="footer-bar">
+      <div class="footer-info" id="footerInfo">Dados salvos automaticamente no navegador</div>
+      <div style="display:flex;gap:7px">
+        <button class="btn" id="btnAnterior" onclick="navPage(-1)" style="display:none"><i class="ti ti-chevron-left"></i> Anterior</button>
+        <button class="btn" id="btnProximo" onclick="navPage(1)">Próximo <i class="ti ti-chevron-right"></i></button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script src="aeps.js"></script>
+<script src="logo-data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

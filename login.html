@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#1F3864">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="AEP NR-17">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>AEP NR-17 — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito Sans',system-ui,sans-serif;background:#F0F4FA;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.card{background:#fff;border-radius:16px;box-shadow:0 4px 32px rgba(31,56,100,.13);width:100%;max-width:400px;padding:36px 30px 28px}
+.logo-img{background:#000;border-radius:10px;padding:14px 18px;margin-bottom:14px;text-align:center}
+.logo-img img{max-width:220px;width:100%;height:auto;display:block;margin:0 auto}
+.app-name{text-align:center;font-size:18px;font-weight:800;color:#1F3864;margin-bottom:2px}
+.app-sub{text-align:center;font-size:11px;color:#8A96A8;margin-bottom:24px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:700;color:#4A5568;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.field input{width:100%;padding:11px 13px;border:1.5px solid #DDE2EA;border-radius:8px;font-size:14px;font-family:inherit;color:#1A2332;outline:none}
+.field input:focus{border-color:#185FA5;box-shadow:0 0 0 3px rgba(24,95,165,.1)}
+.btn{width:100%;padding:13px;background:#1F3864;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .15s}
+.btn:hover{opacity:.9}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.msg{padding:10px 13px;border-radius:8px;font-size:12px;margin-bottom:14px;display:none;align-items:center;gap:8px;border:1px solid}
+.msg.show{display:flex}
+.msg.error{background:#FFF0F0;border-color:#F5C6C6;color:#C0392B}
+.note{text-align:center;font-size:11px;color:#8A96A8;margin-top:16px;line-height:1.5}
+.note code{background:#F0F4FA;color:#185FA5;padding:1px 5px;border-radius:3px;font-family:monospace;font-size:10px}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-img"><img src="logo-prevent.png" alt="Dr. Prevent Saúde Ocupacional"></div>
+  <div class="app-name">AEP NR-17</div>
+  <div class="app-sub">Avaliação Ergonômica Preliminar</div>
+
+  <div class="msg" id="errMsg">
+    <i class="ti ti-alert-circle"></i>
+    <span id="errText"></span>
+  </div>
+
+  <div class="field">
+    <label>Usuário</label>
+    <input type="text" id="username" placeholder="Digite seu usuário" autocapitalize="none" autocomplete="username">
+  </div>
+  <div class="field">
+    <label>Senha</label>
+    <input type="password" id="password" placeholder="Digite sua senha" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+  </div>
+  <button class="btn" id="btnLogin" onclick="doLogin()">
+    <i class="ti ti-login"></i> Entrar
+  </button>
+
+  <div class="note">
+    Primeiro acesso: <code>admin</code> / <code>admin123</code><br>
+    Funciona offline após o primeiro acesso.
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script>
+async function doLogin(){
+  const u = document.getElementById('username').value;
+  const p = document.getElementById('password').value;
+  const btn = document.getElementById('btnLogin');
+  const err = document.getElementById('errMsg');
+
+  err.classList.remove('show');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader-2"></i> Entrando...';
+
+  try{
+    // Garante que admin existe (caso seja o primeiro login)
+    await AEPAuth.garantirAdmin();
+
+    const result = await AEPAuth.login(u, p);
+    if(result.ok){
+      AEPAuth.setSession(result.user, result.nome, result.role);
+      window.location.href = 'aeps.html';
+    } else {
+      document.getElementById('errText').textContent = result.msg;
+      err.classList.add('show');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="ti ti-login"></i> Entrar';
+    }
+  }catch(e){
+    document.getElementById('errText').textContent = 'Erro: ' + e.message;
+    err.classList.add('show');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-login"></i> Entrar';
+  }
+}
+
+// Auto-redirect se já logado
+(function(){
+  const s = AEPAuth.getSession();
+  if(s) window.location.href = 'aeps.html';
+})();
+
+// Service Worker
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

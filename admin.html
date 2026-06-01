@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#1F3864">
+<title>AEP NR-17 — Administração</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito Sans',system-ui,sans-serif;background:#F0F4FA;color:#1A2332;min-height:100vh}
+.topbar{background:#1F3864;color:#fff;padding:12px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.topbar-logo{background:#000;border-radius:5px;padding:4px 8px}
+.topbar-logo img{height:26px;display:block}
+.topbar-title{font-size:14px;font-weight:800;display:flex;align-items:center;gap:7px}
+.topbar-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn-top{padding:6px 13px;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px}
+.btn-top:hover{background:rgba(255,255,255,.2)}
+.btn-app{background:#185FA5;border-color:#185FA5}
+.btn-app:hover{background:#1a6bbf}
+.main{max-width:880px;margin:30px auto;padding:0 16px 40px}
+.page-title{font-size:20px;font-weight:800;color:#1F3864;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.page-sub{font-size:13px;color:#8A96A8;margin-bottom:22px}
+.info-box{background:#EBF3FB;border:1px solid #C8DDF5;border-radius:9px;padding:12px 14px;font-size:12px;color:#185FA5;margin-bottom:18px;display:flex;gap:10px;line-height:1.6}
+.info-box i{font-size:18px;flex-shrink:0;margin-top:1px}
+.info-box code{background:rgba(255,255,255,.7);padding:1px 5px;border-radius:3px;font-family:monospace;font-size:11px}
+.card{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(31,56,100,.08);padding:22px;margin-bottom:18px}
+.card-title{font-size:12px;font-weight:700;color:#1F3864;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:11px;font-weight:700;color:#4A5568;text-transform:uppercase;letter-spacing:.4px}
+.field input,.field select{padding:9px 11px;border:1.5px solid #DDE2EA;border-radius:7px;font-size:13px;font-family:inherit;color:#1A2332;outline:none}
+.field input:focus,.field select:focus{border-color:#185FA5}
+.btn{padding:9px 18px;border-radius:7px;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;transition:opacity .15s}
+.btn:hover{opacity:.88}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:#1F3864;color:#fff}
+.btn-success{background:#3B6D11;color:#fff}
+.btn-danger{background:#C0392B;color:#fff}
+.btn-warn{background:#854F0B;color:#fff}
+.btn-sm{padding:5px 11px;font-size:11px}
+.msg{padding:10px 13px;border-radius:7px;font-size:12px;margin-bottom:12px;display:none;align-items:center;gap:7px}
+.msg.show{display:flex}
+.msg.ok{background:#EAF3DE;border:1px solid #C0DD97;color:#3B6D11}
+.msg.err{background:#FFF0F0;border:1px solid #F5C6C6;color:#C0392B}
+.users-table{width:100%;border-collapse:collapse}
+.users-table th{padding:8px 10px;text-align:left;background:#1F3864;color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.users-table td{padding:9px 10px;border-bottom:1px solid #EEF2F8;font-size:13px}
+.users-table tr:hover td{background:#F8FAFD}
+.role-badge,.status-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700}
+.role-admin{background:#1F3864;color:#fff}
+.role-tecnico{background:#EAF3DE;color:#3B6D11}
+.status-on{background:#EAF3DE;color:#3B6D11}
+.status-off{background:#FFEBEE;color:#C0392B}
+.actions{display:flex;gap:5px}
+code.uname{background:#F0F4FA;padding:2px 6px;border-radius:4px;font-size:11px;font-family:monospace}
+@media(max-width:600px){.form-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo"><img src="logo-prevent.png" alt="Dr. Prevent"></div>
+    <div class="topbar-title"><i class="ti ti-settings"></i> Administração</div>
+  </div>
+  <div class="topbar-actions">
+    <span style="font-size:11px;color:rgba(255,255,255,.7);display:flex;align-items:center;gap:5px;padding:5px 10px;background:rgba(255,255,255,.08);border-radius:18px"><i class="ti ti-user-circle"></i> <span id="adminName"></span></span>
+    <button class="btn-top btn-app" onclick="window.location.href='aeps.html'"><i class="ti ti-folders"></i> Minhas AEPs</button>
+    <button class="btn-top" onclick="AEPAuth.logout()"><i class="ti ti-logout"></i> Sair</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="page-title"><i class="ti ti-users"></i> Gerenciamento de usuários</div>
+  <div class="page-sub">Cadastre e gerencie os técnicos que terão acesso ao sistema.</div>
+
+  <div class="info-box">
+    <i class="ti ti-info-circle"></i>
+    <div>
+      <strong>Primeiro acesso:</strong> usuário <code>admin</code>, senha <code>admin123</code>.
+      Altere a senha do admin imediatamente após o primeiro acesso clicando no botão Editar abaixo.
+    </div>
+  </div>
+
+  <!-- Cadastrar novo -->
+  <div class="card">
+    <div class="card-title"><i class="ti ti-user-plus"></i> Cadastrar novo usuário</div>
+    <div class="msg" id="addMsg"></div>
+    <div class="form-row">
+      <div class="field"><label>Nome completo *</label><input id="newNome" placeholder="Ex.: João Silva"></div>
+      <div class="field"><label>Login (usuário) *</label><input id="newUser" placeholder="Ex.: joao.silva" autocapitalize="none"></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label>Senha *</label><input type="password" id="newPwd" placeholder="Mínimo 4 caracteres"></div>
+      <div class="field"><label>Perfil</label>
+        <select id="newRole">
+          <option value="tecnico">Técnico</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-success" id="btnAdd" onclick="cadastrar()"><i class="ti ti-plus"></i> Cadastrar usuário</button>
+  </div>
+
+  <!-- Lista -->
+  <div class="card">
+    <div class="card-title"><i class="ti ti-users"></i> Usuários cadastrados</div>
+    <div id="tableWrap"></div>
+  </div>
+
+  <!-- Editar -->
+  <div class="card" id="editCard" style="display:none">
+    <div class="card-title"><i class="ti ti-edit"></i> Editar: <span id="editTitle"></span></div>
+    <div class="msg" id="editMsg"></div>
+    <div class="form-row">
+      <div class="field"><label>Nome completo</label><input id="editNome"></div>
+      <div class="field"><label>Nova senha (deixe vazio para manter)</label><input type="password" id="editPwd" placeholder="Nova senha"></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label>Perfil</label>
+        <select id="editRole"><option value="tecnico">Técnico</option><option value="admin">Administrador</option></select>
+      </div>
+      <div class="field"><label>Status</label>
+        <select id="editAtivo"><option value="true">Ativo</option><option value="false">Inativo</option></select>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary" id="btnSave" onclick="salvarEdicao()"><i class="ti ti-check"></i> Salvar</button>
+      <button class="btn" style="background:#EEF2F8;color:#4A5568" onclick="cancelar()"><i class="ti ti-x"></i> Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script>
+const sess = AEPAuth.requireAdmin();
+if(sess) document.getElementById('adminName').textContent = sess.nome || sess.user;
+
+let editando = null;
+
+function escHTML(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function showMsg(id, text, type){
+  const el = document.getElementById(id);
+  el.className = 'msg show ' + (type==='ok'?'ok':'err');
+  el.innerHTML = `<i class="ti ti-${type==='ok'?'circle-check':'alert-circle'}"></i> ${text}`;
+  setTimeout(()=>el.classList.remove('show'), 4000);
+}
+
+function renderTable(){
+  const users = AEPAuth.listUsers();
+  const wrap = document.getElementById('tableWrap');
+  if(!users.length){ wrap.innerHTML='<p style="color:#8A96A8;font-size:13px">Nenhum usuário cadastrado.</p>'; return; }
+  let html = `<table class="users-table">
+    <tr><th>Nome</th><th>Usuário</th><th>Perfil</th><th>Status</th><th>Ações</th></tr>`;
+  users.forEach(u=>{
+    html += `<tr>
+      <td><strong>${escHTML(u.nome)}</strong></td>
+      <td><code class="uname">${escHTML(u.username)}</code></td>
+      <td><span class="role-badge ${u.role==='admin'?'role-admin':'role-tecnico'}">${u.role==='admin'?'Admin':'Técnico'}</span></td>
+      <td><span class="status-badge ${u.ativo?'status-on':'status-off'}">${u.ativo?'Ativo':'Inativo'}</span></td>
+      <td><div class="actions">
+        <button class="btn btn-warn btn-sm" onclick="abrirEdicao('${escHTML(u.username)}')"><i class="ti ti-edit"></i> Editar</button>
+        ${u.username!=='admin'?`<button class="btn btn-danger btn-sm" onclick="excluir('${escHTML(u.username)}')"><i class="ti ti-trash"></i></button>`:''}
+      </div></td>
+    </tr>`;
+  });
+  html += '</table>';
+  wrap.innerHTML = html;
+}
+
+async function cadastrar(){
+  const btn = document.getElementById('btnAdd');
+  btn.disabled = true;
+  try{
+    const r = await AEPAuth.addUser({
+      nome: document.getElementById('newNome').value,
+      username: document.getElementById('newUser').value,
+      password: document.getElementById('newPwd').value,
+      role: document.getElementById('newRole').value
+    });
+    if(r.ok){
+      showMsg('addMsg', 'Usuário cadastrado com sucesso!', 'ok');
+      ['newNome','newUser','newPwd'].forEach(id => document.getElementById(id).value='');
+      renderTable();
+    } else showMsg('addMsg', r.msg, 'err');
+  }catch(e){ showMsg('addMsg', 'Erro: '+e.message, 'err'); }
+  btn.disabled = false;
+}
+
+function abrirEdicao(username){
+  const u = AEPAuth.listUsers().find(x => x.username === username);
+  if(!u) return;
+  editando = username;
+  document.getElementById('editTitle').textContent = `${u.nome} (${u.username})`;
+  document.getElementById('editNome').value = u.nome;
+  document.getElementById('editPwd').value = '';
+  document.getElementById('editRole').value = u.role;
+  document.getElementById('editAtivo').value = String(u.ativo);
+  document.getElementById('editCard').style.display = 'block';
+  document.getElementById('editCard').scrollIntoView({behavior:'smooth'});
+}
+
+async function salvarEdicao(){
+  const btn = document.getElementById('btnSave');
+  btn.disabled = true;
+  try{
+    const r = await AEPAuth.updateUser({
+      username: editando,
+      nome: document.getElementById('editNome').value,
+      password: document.getElementById('editPwd').value || undefined,
+      role: document.getElementById('editRole').value,
+      ativo: document.getElementById('editAtivo').value === 'true'
+    });
+    if(r.ok){
+      showMsg('editMsg', 'Dados atualizados!', 'ok');
+      setTimeout(cancelar, 1200);
+      renderTable();
+    } else showMsg('editMsg', r.msg, 'err');
+  }catch(e){ showMsg('editMsg', 'Erro: '+e.message, 'err'); }
+  btn.disabled = false;
+}
+
+function cancelar(){
+  editando = null;
+  document.getElementById('editCard').style.display = 'none';
+}
+
+function excluir(username){
+  if(!confirm(`Excluir "${username}"? Esta ação não pode ser desfeita.`)) return;
+  const r = AEPAuth.deleteUser(username);
+  if(r.ok) renderTable();
+  else alert(r.msg);
+}
+
+renderTable();
+</script>
+</body>
+</html>
