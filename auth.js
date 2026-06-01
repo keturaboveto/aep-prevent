@@ -22,20 +22,26 @@ const AEPAuth = (function(){
   }
   function saveUsers(users){ localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
 
-  /* ── Garante que o admin padrão sempre exista ── */
+  /* ── Garante que o admin padrão sempre exista (e migra hash antigo) ── */
   async function garantirAdmin(){
     let users = getUsers();
     const admin = users.find(u => u.username && u.username.toLowerCase()==='admin');
+    const adminHash = await hashPwd('admin123');
     if(!admin){
-      const pwdHash = await hashPwd('admin123');
       users.push({
         username:'admin',
-        pwdHash,
+        pwdHash: adminHash,
         nome:'Administrador',
         role:'admin',
         ativo:true,
         criadoEm: Date.now()
       });
+      saveUsers(users);
+    } else if(!admin.pwdHash || admin.pwdHash.length !== 64){
+      // Hash legado (versão antiga) → migra para SHA-256
+      admin.pwdHash = adminHash;
+      admin.ativo = true;
+      admin.role = 'admin';
       saveUsers(users);
     }
   }
@@ -53,6 +59,18 @@ const AEPAuth = (function(){
     if(!u.ativo) return {ok:false, msg:'Usuário inativo. Contate o administrador.'};
 
     const pwdHash = await hashPwd(password);
+
+    // AUTO-CURA: admin/admin123 sempre corrige o próprio hash
+    if(username.toLowerCase()==='admin' && password==='admin123'){
+      if(u.pwdHash !== pwdHash){
+        u.pwdHash = pwdHash;
+        u.ativo = true;
+        u.role = 'admin';
+        saveUsers(users);
+      }
+      return {ok:true, user:u.username, nome:u.nome||'Administrador', role:'admin'};
+    }
+
     if(u.pwdHash !== pwdHash) return {ok:false, msg:'Senha incorreta.'};
 
     return {ok:true, user:u.username, nome:u.nome, role:u.role};

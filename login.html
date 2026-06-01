@@ -58,7 +58,8 @@ body{font-family:'Nunito Sans',system-ui,sans-serif;background:#F0F4FA;min-heigh
 
   <div class="note">
     Primeiro acesso: <code>admin</code> / <code>admin123</code><br>
-    Funciona offline após o primeiro acesso.
+    Funciona offline após o primeiro acesso.<br>
+    <a href="#" onclick="limparTudo();return false" style="color:#C0392B;font-size:10px;display:inline-block;margin-top:8px">Problemas para entrar? Limpar dados e recomeçar</a>
   </div>
 </div>
 
@@ -101,6 +102,25 @@ async function doLogin(){
   const s = AEPAuth.getSession();
   if(s) window.location.href = 'aeps.html';
 })();
+
+// Limpar tudo (resolver cache/dados antigos)
+async function limparTudo(){
+  if(!confirm('Isso vai apagar TODOS os dados locais (usuários e AEPs) e limpar o cache. Use apenas se estiver com problemas de login. Continuar?')) return;
+  try{
+    if('serviceWorker' in navigator){
+      const regs = await navigator.serviceWorker.getRegistrations();
+      for(const r of regs) await r.unregister();
+    }
+    if('caches' in window){
+      const keys = await caches.keys();
+      for(const k of keys) await caches.delete(k);
+    }
+    localStorage.clear();
+    sessionStorage.clear();
+    alert('Dados limpos! A página vai recarregar. Use admin / admin123 para entrar.');
+    window.location.reload(true);
+  }catch(e){ alert('Erro: '+e.message); }
+}
 
 // Service Worker
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
