@@ -9,12 +9,12 @@
    ════════════════════════════════════════════════════════════ */
 
 const firebaseConfig = {
-  apiKey:            "COLE_AQUI_apiKey",
-  authDomain:        "COLE_AQUI_authDomain",
-  projectId:         "COLE_AQUI_projectId",
-  storageBucket:     "COLE_AQUI_storageBucket",
-  messagingSenderId: "COLE_AQUI_messagingSenderId",
-  appId:             "COLE_AQUI_appId"
+  apiKey:            "AIzaSyXXXXXXXXXXXXXXXXXXXXX",
+  authDomain:        "aep-prevent.firebaseapp.com",
+  projectId:         "aep-prevent",
+  storageBucket:     "aep-prevent.appspot.com",
+  messagingSenderId: "123456789012",
+  appId:             "1:123456789012:web:abc123def456"
 };
 
 /* ─── Inicialização (não precisa mexer daqui para baixo) ─── */
