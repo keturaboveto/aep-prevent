@@ -134,6 +134,9 @@ code.uname{background:#F0F4FA;padding:2px 6px;border-radius:4px;font-size:11px;f
   </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
 <script src="auth.js"></script>
 <script>
 const sess = AEPAuth.requireAdmin();
@@ -150,8 +153,8 @@ function showMsg(id, text, type){
   setTimeout(()=>el.classList.remove('show'), 4000);
 }
 
-function renderTable(){
-  const users = AEPAuth.listUsers();
+async function renderTable(){
+  const users = await AEPAuth.listUsers();
   const wrap = document.getElementById('tableWrap');
   if(!users.length){ wrap.innerHTML='<p style="color:#8A96A8;font-size:13px">Nenhum usuário cadastrado.</p>'; return; }
   let html = `<table class="users-table">
@@ -191,8 +194,9 @@ async function cadastrar(){
   btn.disabled = false;
 }
 
-function abrirEdicao(username){
-  const u = AEPAuth.listUsers().find(x => x.username === username);
+async function abrirEdicao(username){
+  const users = await AEPAuth.listUsers();
+  const u = users.find(x => x.username === username);
   if(!u) return;
   editando = username;
   document.getElementById('editTitle').textContent = `${u.nome} (${u.username})`;
@@ -229,9 +233,9 @@ function cancelar(){
   document.getElementById('editCard').style.display = 'none';
 }
 
-function excluir(username){
+async function excluir(username){
   if(!confirm(`Excluir "${username}"? Esta ação não pode ser desfeita.`)) return;
-  const r = AEPAuth.deleteUser(username);
+  const r = await AEPAuth.deleteUser(username);
   if(r.ok) renderTable();
   else alert(r.msg);
 }
