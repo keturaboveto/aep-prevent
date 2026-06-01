@@ -9,12 +9,12 @@
    ════════════════════════════════════════════════════════════ */
 
 const firebaseConfig = {
-  apiKey:            "COLE_AQUI_apiKey",
-  authDomain:        "COLE_AQUI_authDomain",
-  projectId:         "COLE_AQUI_projectId",
-  storageBucket:     "COLE_AQUI_storageBucket",
-  messagingSenderId: "COLE_AQUI_messagingSenderId",
-  appId:             "COLE_AQUI_appId"
+  apiKey:            "AIzaSyDnyaSfVX0oo_5eiWUdgXyZ5skGg9gnjqQ",
+  authDomain:        "aep-prevent.firebaseapp.com",
+  projectId:         "aep-prevent",
+  storageBucket:     "aep-prevent.firebasestorage.app",
+  messagingSenderId: "295998191963",
+  appId:             "1:295998191963:web:128a64e368856d70eb027e"
 };
 
 /* ─── Inicialização (não precisa mexer daqui para baixo) ─── */
