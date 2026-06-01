@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AEP NR-17 — Diagnóstico Firebase</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito Sans',system-ui,sans-serif;background:#F0F4FA;min-height:100vh;padding:24px 16px}
+.card{max-width:600px;margin:0 auto;background:#fff;border-radius:14px;box-shadow:0 4px 32px rgba(31,56,100,.12);padding:28px 26px}
+h1{color:#1F3864;font-size:20px;margin-bottom:6px}
+.sub{color:#8A96A8;font-size:13px;margin-bottom:22px;line-height:1.5}
+.btn{display:block;width:100%;padding:14px;border-radius:10px;border:none;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:12px;background:#185FA5;color:#fff}
+.btn:hover{opacity:.9}
+.btn-ghost{background:#EEF2F8;color:#4A5568}
+.test{padding:12px 14px;border-radius:9px;margin-bottom:10px;font-size:13px;display:flex;align-items:flex-start;gap:10px;border:1px solid}
+.test .icon{font-size:18px;flex-shrink:0}
+.test.wait{background:#F8FAFD;border-color:#DDE2EA;color:#8A96A8}
+.test.ok{background:#EAF3DE;border-color:#C0DD97;color:#3B6D11}
+.test.err{background:#FFF0F0;border-color:#F5C6C6;color:#C0392B}
+.test b{display:block;margin-bottom:2px}
+.test small{font-size:11px;opacity:.85;line-height:1.5;font-family:monospace}
+.result{margin-top:18px;padding:16px;border-radius:10px;font-size:13px;line-height:1.6;display:none}
+.result.show{display:block}
+.result.success{background:#EAF3DE;color:#3B6D11;border:1px solid #C0DD97}
+.result.fail{background:#FFF8E8;color:#854F0B;border:1px solid #F4B942}
+.result ol{margin:8px 0 0 18px}
+.result li{margin-bottom:5px}
+code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:3px;font-family:monospace;font-size:11px}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>🔬 Diagnóstico do Firebase</h1>
+  <p class="sub">Esta página testa se o Firebase está configurado e funcionando corretamente. Clique no botão para rodar os testes.</p>
+
+  <button class="btn" onclick="rodarTestes()">▶ Rodar testes</button>
+
+  <div id="tests"></div>
+  <div id="result" class="result"></div>
+
+  <button class="btn btn-ghost" onclick="window.location.href='login.html'" style="margin-top:14px">← Voltar ao login</button>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+function addTest(id, titulo){
+  const div = document.createElement('div');
+  div.className = 'test wait';
+  div.id = 'test-'+id;
+  div.innerHTML = `<span class="icon">⏳</span><div><b>${titulo}</b><small id="msg-${id}">aguardando...</small></div>`;
+  document.getElementById('tests').appendChild(div);
+}
+function setTest(id, ok, msg){
+  const div = document.getElementById('test-'+id);
+  div.className = 'test ' + (ok?'ok':'err');
+  div.querySelector('.icon').textContent = ok?'✓':'✗';
+  document.getElementById('msg-'+id).textContent = msg;
+}
+
+async function rodarTestes(){
+  document.getElementById('tests').innerHTML = '';
+  document.getElementById('result').className = 'result';
+
+  addTest('config', '1. Credenciais preenchidas');
+  addTest('connect', '2. Conexão com Firebase');
+  addTest('write', '3. Gravar no banco (Firestore)');
+  addTest('read', '4. Ler do banco (Firestore)');
+
+  let falha = null;
+
+  // Teste 1: config
+  await new Promise(r=>setTimeout(r,300));
+  if(!window.firebaseReady){
+    setTest('config', false, 'As credenciais NÃO foram preenchidas em firebase-config.js (ou estão incorretas).');
+    falha = 'config';
+  } else {
+    setTest('config', true, 'Credenciais encontradas no firebase-config.js');
+  }
+
+  // Teste 2: conexão
+  await new Promise(r=>setTimeout(r,300));
+  if(!window.firebaseDB){
+    setTest('connect', false, 'Firebase não inicializou. Verifique as credenciais.');
+    if(!falha) falha = 'connect';
+  } else {
+    setTest('connect', true, 'Firebase conectado: projeto "' + (firebase.app().options.projectId||'?') + '"');
+  }
+
+  // Teste 3: gravar
+  if(window.firebaseDB){
+    await new Promise(r=>setTimeout(r,300));
+    try{
+      await window.firebaseDB.collection('_teste').doc('ping').set({t:Date.now()});
+      setTest('write', true, 'Gravação funcionou! As regras permitem escrita.');
+    }catch(e){
+      setTest('write', false, 'BLOQUEADO: ' + e.message);
+      if(!falha) falha = 'write';
+    }
+
+    // Teste 4: ler
+    await new Promise(r=>setTimeout(r,300));
+    try{
+      await window.firebaseDB.collection('_teste').doc('ping').get();
+      setTest('read', true, 'Leitura funcionou! As regras permitem leitura.');
+      // limpa o teste
+      try{ await window.firebaseDB.collection('_teste').doc('ping').delete(); }catch(e){}
+    }catch(e){
+      setTest('read', false, 'BLOQUEADO: ' + e.message);
+      if(!falha) falha = 'read';
+    }
+  } else {
+    setTest('write', false, 'Pulado (sem conexão)');
+    setTest('read', false, 'Pulado (sem conexão)');
+  }
+
+  // Resultado
+  const result = document.getElementById('result');
+  if(!falha){
+    result.className = 'result show success';
+    result.innerHTML = '<b>🎉 Tudo funcionando!</b><br>O Firebase está configurado corretamente. Volte ao login e use <code>admin</code> / <code>admin123</code>. Em seguida cadastre os técnicos no painel Admin — eles vão conseguir logar de qualquer dispositivo.';
+  } else if(falha==='config' || falha==='connect'){
+    result.className = 'result show fail';
+    result.innerHTML = '<b>⚠️ Firebase não configurado</b><br>Você precisa:<ol>'
+      + '<li>Criar o projeto no Firebase (veja <code>FIREBASE-SETUP.md</code>)</li>'
+      + '<li>Colar as 6 credenciais no arquivo <code>firebase-config.js</code></li>'
+      + '<li>Enviar o <code>firebase-config.js</code> atualizado ao GitHub</li>'
+      + '<li>Recarregar esta página e testar de novo</li></ol>';
+  } else {
+    result.className = 'result show fail';
+    result.innerHTML = '<b>⚠️ Regras do Firestore bloqueando</b><br>O Firebase conectou, mas as regras de segurança estão impedindo leitura/escrita. Faça:<ol>'
+      + '<li>No Firebase → <b>Firestore Database</b> → aba <b>Regras</b></li>'
+      + '<li>Cole as regras que estão no <code>FIREBASE-SETUP.md</code> (Parte 5)</li>'
+      + '<li>Clique em <b>Publicar</b></li>'
+      + '<li>Recarregue esta página e teste de novo</li></ol>'
+      + 'Dica rápida: para teste imediato, use a regra <code>allow read, write: if true;</code>';
+  }
+}
+</script>
+</body>
+</html>

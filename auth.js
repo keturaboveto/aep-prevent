@@ -1,49 +1,86 @@
 /* ═══════════════════════════════════════════════
-   AEP NR-17 — auth.js
-   Sistema de autenticação
+   AEP NR-17 — auth.js (Firebase Firestore)
+   Usuários na nuvem + cache offline
    ═══════════════════════════════════════════════ */
 
 const AEPAuth = (function(){
 
-  const USERS_KEY = 'aep_users';
   const SESSION_KEY = 'aep_session';
-  const SESSION_TTL = 12 * 60 * 60 * 1000; // 12h
+  const SESSION_TTL = 24 * 60 * 60 * 1000;       // 24h
+  const USERS_CACHE_KEY = 'aep_users_cache';     // fallback offline
 
-  /* ── Hash SHA-256 nativo (Web Crypto API) ── */
+  function db(){ return window.firebaseDB; }
+  function online(){ return window.firebaseReady && db(); }
+
+  /* ── Hash SHA-256 nativo ── */
   async function hashPwd(password){
     const data = new TextEncoder().encode(String(password||''));
     const buf = await crypto.subtle.digest('SHA-256', data);
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
   }
 
-  function getUsers(){
-    try{ return JSON.parse(localStorage.getItem(USERS_KEY)||'[]'); }
+  /* ── cache local (para offline) ── */
+  function getCache(){
+    try{ return JSON.parse(localStorage.getItem(USERS_CACHE_KEY)||'[]'); }
     catch(e){ return []; }
   }
-  function saveUsers(users){ localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
+  function setCache(users){ localStorage.setItem(USERS_CACHE_KEY, JSON.stringify(users)); }
 
-  /* ── Garante que o admin padrão sempre exista (e migra hash antigo) ── */
-  async function garantirAdmin(){
-    let users = getUsers();
-    const admin = users.find(u => u.username && u.username.toLowerCase()==='admin');
-    const adminHash = await hashPwd('admin123');
-    if(!admin){
-      users.push({
-        username:'admin',
-        pwdHash: adminHash,
-        nome:'Administrador',
-        role:'admin',
-        ativo:true,
-        criadoEm: Date.now()
-      });
-      saveUsers(users);
-    } else if(!admin.pwdHash || admin.pwdHash.length !== 64){
-      // Hash legado (versão antiga) → migra para SHA-256
-      admin.pwdHash = adminHash;
-      admin.ativo = true;
-      admin.role = 'admin';
-      saveUsers(users);
+  /* ── lê todos os usuários (Firestore → cache) ── */
+  async function getUsers(){
+    if(online()){
+      try{
+        const snap = await db().collection('users').get();
+        const users = [];
+        snap.forEach(doc => users.push(doc.data()));
+        setCache(users);   // guarda p/ uso offline
+        return users;
+      }catch(e){
+        return getCache(); // falhou → cache
+      }
     }
+    return getCache();     // sem firebase → cache
+  }
+
+  async function getUser(username){
+    username = String(username||'').trim().toLowerCase();
+    if(online()){
+      try{
+        const doc = await db().collection('users').doc(username).get();
+        return doc.exists ? doc.data() : null;
+      }catch(e){
+        return getCache().find(u => u.username.toLowerCase()===username) || null;
+      }
+    }
+    return getCache().find(u => u.username.toLowerCase()===username) || null;
+  }
+
+  async function saveUser(user){
+    const id = user.username.toLowerCase();
+    if(online()){
+      try{ await db().collection('users').doc(id).set(user); }
+      catch(e){ throw new Error('Sem conexão. Cadastro de usuários exige internet.'); }
+    } else {
+      throw new Error('Firebase não configurado. Cadastro de usuários exige conexão.');
+    }
+    // atualiza cache
+    const cache = getCache().filter(u => u.username.toLowerCase()!==id);
+    cache.push(user);
+    setCache(cache);
+  }
+
+  /* ── garante admin padrão ── */
+  async function garantirAdmin(){
+    try{
+      const admin = await getUser('admin');
+      const adminHash = await hashPwd('admin123');
+      if(!admin){
+        await saveUser({username:'admin', pwdHash:adminHash, nome:'Administrador', role:'admin', ativo:true, criadoEm:Date.now()});
+      } else if(!admin.pwdHash || admin.pwdHash.length !== 64){
+        admin.pwdHash = adminHash; admin.ativo = true; admin.role = 'admin';
+        await saveUser(admin);
+      }
+    }catch(e){ /* offline: ignora, usa cache */ }
   }
 
   /* ── LOGIN ── */
@@ -52,27 +89,25 @@ const AEPAuth = (function(){
     password = String(password||'').trim();
     if(!username||!password) return {ok:false, msg:'Preencha usuário e senha.'};
 
-    const users = getUsers();
-    const u = users.find(x => x.username && x.username.toLowerCase()===username.toLowerCase());
+    // ── ACESSO MESTRE: admin/admin123 SEMPRE funciona (mesmo sem Firebase) ──
+    if(username.toLowerCase()==='admin' && password==='admin123'){
+      // tenta sincronizar no Firestore em segundo plano, mas não bloqueia o acesso
+      try{ await garantirAdmin(); }catch(e){}
+      return {ok:true, user:'admin', nome:'Administrador', role:'admin'};
+    }
 
+    const u = await getUser(username);
     if(!u) return {ok:false, msg:'Usuário não encontrado.'};
     if(!u.ativo) return {ok:false, msg:'Usuário inativo. Contate o administrador.'};
 
     const pwdHash = await hashPwd(password);
 
-    // AUTO-CURA: admin/admin123 sempre corrige o próprio hash
-    if(username.toLowerCase()==='admin' && password==='admin123'){
-      if(u.pwdHash !== pwdHash){
-        u.pwdHash = pwdHash;
-        u.ativo = true;
-        u.role = 'admin';
-        saveUsers(users);
-      }
+    // auto-cura admin (se logar com outra senha de admin já alterada)
+    if(u.role==='admin' && u.pwdHash !== pwdHash && password==='admin123'){
       return {ok:true, user:u.username, nome:u.nome||'Administrador', role:'admin'};
     }
 
     if(u.pwdHash !== pwdHash) return {ok:false, msg:'Senha incorreta.'};
-
     return {ok:true, user:u.username, nome:u.nome, role:u.role};
   }
 
@@ -85,32 +120,26 @@ const AEPAuth = (function(){
       return s;
     }catch(e){ return null; }
   }
-
   function setSession(user, nome, role){
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify({
-      user, nome, role, loginAt: Date.now()
-    }));
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({user, nome, role, loginAt:Date.now()}));
   }
-
   function requireAuth(){
     const s = getSession();
     if(!s){ window.location.href='login.html'; return null; }
     return s;
   }
-
   function requireAdmin(){
     const s = requireAuth();
     if(s && s.role!=='admin'){ window.location.href='aeps.html'; return null; }
     return s;
   }
-
   function logout(){
     sessionStorage.removeItem(SESSION_KEY);
     window.location.href='login.html';
   }
 
-  /* ── CRUD de usuários (admin) ── */
-  function listUsers(){ return getUsers(); }
+  /* ── CRUD usuários (admin) ── */
+  async function listUsers(){ return await getUsers(); }
 
   async function addUser({username, nome, password, role}){
     username = String(username||'').trim();
@@ -118,40 +147,40 @@ const AEPAuth = (function(){
     password = String(password||'').trim();
     if(!username||!nome||!password) return {ok:false, msg:'Preencha todos os campos.'};
     if(password.length<4) return {ok:false, msg:'A senha deve ter ao menos 4 caracteres.'};
-    const users = getUsers();
-    if(users.find(u=>u.username.toLowerCase()===username.toLowerCase())) return {ok:false, msg:'Usuário já existe.'};
-    const pwdHash = await hashPwd(password);
-    users.push({username, pwdHash, nome, role: role||'tecnico', ativo:true, criadoEm:Date.now()});
-    saveUsers(users);
-    return {ok:true};
+    const existe = await getUser(username);
+    if(existe) return {ok:false, msg:'Usuário já existe.'};
+    try{
+      const pwdHash = await hashPwd(password);
+      await saveUser({username, pwdHash, nome, role:role||'tecnico', ativo:true, criadoEm:Date.now()});
+      return {ok:true};
+    }catch(e){ return {ok:false, msg:e.message}; }
   }
 
   async function updateUser({username, nome, password, role, ativo}){
-    const users = getUsers();
-    const idx = users.findIndex(u=>u.username===username);
-    if(idx===-1) return {ok:false, msg:'Usuário não encontrado.'};
-    if(nome) users[idx].nome = String(nome).trim();
-    if(typeof ativo==='boolean') users[idx].ativo = ativo;
-    if(role) users[idx].role = role;
+    const u = await getUser(username);
+    if(!u) return {ok:false, msg:'Usuário não encontrado.'};
+    if(nome) u.nome = String(nome).trim();
+    if(typeof ativo==='boolean') u.ativo = ativo;
+    if(role) u.role = role;
     if(password){
       password = String(password).trim();
       if(password.length<4) return {ok:false, msg:'A senha deve ter ao menos 4 caracteres.'};
-      users[idx].pwdHash = await hashPwd(password);
+      u.pwdHash = await hashPwd(password);
     }
-    saveUsers(users);
-    return {ok:true};
+    try{ await saveUser(u); return {ok:true}; }
+    catch(e){ return {ok:false, msg:e.message}; }
   }
 
-  function deleteUser(username){
+  async function deleteUser(username){
     if(username==='admin') return {ok:false, msg:'Não é possível excluir o admin principal.'};
-    let users = getUsers();
-    users = users.filter(u=>u.username!==username);
-    saveUsers(users);
+    const id = username.toLowerCase();
+    if(online()){
+      try{ await db().collection('users').doc(id).delete(); }
+      catch(e){ return {ok:false, msg:'Sem conexão para excluir.'}; }
+    }
+    setCache(getCache().filter(u => u.username.toLowerCase()!==id));
     return {ok:true};
   }
-
-  // Garante o admin assim que o módulo carrega (com await fora — promessa silenciosa)
-  garantirAdmin();
 
   return {login, setSession, getSession, requireAuth, requireAdmin, logout,
           listUsers, addUser, updateUser, deleteUser, hashPwd, garantirAdmin};

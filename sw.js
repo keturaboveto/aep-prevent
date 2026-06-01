@@ -1,6 +1,6 @@
-const CACHE = 'aep-nr17-final-v1';
-const ASSETS = ['./', './login.html', './aeps.html', './admin.html', './index.html',
-  './auth.js', './aeps.js', './app.js', './logo-data.js',
+const CACHE = 'aep-nr17-final-v2';
+const ASSETS = ['./', './login.html', './diagnostico.html', './aeps.html', './admin.html', './index.html',
+  './auth.js', './aeps.js', './app.js', './logo-data.js', './firebase-config.js',
   './manifest.json', './logo-prevent.png'];
 
 self.addEventListener('install', e => {

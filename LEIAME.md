@@ -1,72 +1,69 @@
 # AEP NR-17 — Dr. Prevent Saúde Ocupacional
-## Versão final, limpa, testada
+## Versão com Firebase (login funciona em qualquer dispositivo)
 
 ---
 
-## ✅ O que esta versão tem
+## ⚡ IMPORTANTE — Leia primeiro
 
-- **Autenticação SHA-256 nativa** (Web Crypto API) — não pode quebrar entre versões
-- **Login com auto-cura** — se admin não existir, é criado automaticamente
-- **Múltiplas AEPs por usuário** — cada técnico tem suas próprias avaliações
-- **Admin vê todas** as AEPs, técnico só as próprias
-- **Nome automático** (razão social + data), editável
-- **Consulta CNPJ** via Brasil API (Receita Federal)
-- **PWA** — instalável e funciona offline
-- **Documento Word** com sumário, fotos lado a lado e cronograma 5W2H em português
+Esta versão usa **Firebase** para que o login funcione em **qualquer dispositivo**
+(celular, PC, tablet). Antes de usar, você precisa fazer uma configuração única
+de ~10 minutos.
 
----
+👉 **Siga o arquivo `FIREBASE-SETUP.md` passo a passo.**
 
-## 📋 Como criar o novo repositório no GitHub
-
-### Passo 1 — Criar repositório
-
-1. Acesse [github.com](https://github.com) (faça login)
-2. Canto superior direito → **+** → **New repository**
-3. Configure:
-   - **Repository name:** `aep-prevent` (ou outro nome de sua escolha)
-   - **Public** ✅ (obrigatório)
-   - **Não marque** Add README
-4. Clique **Create repository**
-
-### Passo 2 — Upload dos arquivos
-
-1. Na tela do repositório recém-criado, clique no link **"uploading an existing file"**
-2. Extraia o ZIP no seu computador
-3. **Selecione TODOS os 11 arquivos** de dentro da pasta (Ctrl+A)
-4. Arraste para o GitHub
-5. Aguarde aparecer a lista completa dos 11 arquivos
-6. Role para baixo → caixa **Commit changes** → mensagem: `Versão inicial`
-7. Clique no botão verde **Commit changes**
-
-### Passo 3 — Ativar GitHub Pages
-
-1. No repositório → **Settings** (engrenagem)
-2. Menu lateral esquerdo → **Pages**
-3. Em **Source** → **Deploy from a branch**
-4. Em **Branch** → mude de "None" para **main** → deixe **/ (root)**
-5. Clique **Save**
-6. Aguarde 2-3 minutos
-
-### Passo 4 — Acessar
-
-1. Volte em Pages, recarregue a página (F5)
-2. Aparecerá: "Your site is live at: https://SEU_USUARIO.github.io/aep-prevent/"
-3. Acesse essa URL
-4. Login: **admin** / Senha: **admin123**
-5. Troque a senha imediatamente em **Admin**
+Sem essa configuração, o app mostrará "Firebase não configurado" e o login não funcionará.
 
 ---
 
-## 📁 Arquivos do pacote
+## Por que Firebase?
+
+Na versão anterior, os usuários ficavam salvos só no navegador onde foram criados
+(localStorage). Por isso o login funcionava no PC do admin, mas não no celular dos
+técnicos — cada dispositivo tinha sua própria "lista de usuários" isolada.
+
+Com o Firebase, os usuários ficam guardados **na nuvem**, acessíveis de qualquer
+aparelho. O login passa a funcionar em todos os dispositivos.
+
+- ✅ **Usuários/login** → nuvem (Firebase) — funciona em qualquer dispositivo
+- ✅ **AEPs preenchidas** → ficam no próprio dispositivo (como você prefere)
+- ✅ **Funciona offline** → depois do primeiro login, o app funciona sem internet em campo
+- ✅ **Custo zero** → plano gratuito do Firebase é mais que suficiente
+
+---
+
+## Ordem de instalação
+
+1. **Configure o Firebase** seguindo `FIREBASE-SETUP.md`
+2. **Cole as credenciais** no arquivo `firebase-config.js`
+3. **Suba todos os arquivos** ao GitHub (veja abaixo)
+4. **Ative o GitHub Pages**
+5. **Acesse e faça login** com admin / admin123
+
+---
+
+## Subir ao GitHub Pages
+
+1. Crie um repositório público (ex.: `aep-prevent`)
+2. **Add file → Upload files**
+3. Arraste **TODOS os arquivos** desta pasta
+4. **Commit changes**
+5. **Settings → Pages → Branch: main → Save**
+6. Acesse `https://SEU_USUARIO.github.io/aep-prevent/`
+
+---
+
+## Arquivos do pacote
 
 | Arquivo | Função |
 |---------|--------|
-| `login.html` | Tela de login (entrada) |
-| `aeps.html` | Lista de AEPs (tela inicial após login) |
+| `FIREBASE-SETUP.md` | **LEIA PRIMEIRO** — guia de configuração do Firebase |
+| `firebase-config.js` | **EDITE** — cole aqui as credenciais do seu Firebase |
+| `login.html` | Tela de login |
+| `aeps.html` | Lista de AEPs (tela inicial) |
 | `admin.html` | Painel de administração de usuários |
-| `index.html` | App principal (cada AEP individual) |
-| `auth.js` | Autenticação (SHA-256) |
-| `aeps.js` | Gerenciador de múltiplas AEPs |
+| `index.html` | App principal (cada AEP) |
+| `auth.js` | Autenticação (Firebase + SHA-256) |
+| `aeps.js` | Gerenciador de AEPs (local no dispositivo) |
 | `app.js` | Lógica do app + gerador de Word |
 | `logo-data.js` | Logo Dr. Prevent (base64) |
 | `logo-prevent.png` | Logo PNG |
@@ -76,28 +73,12 @@
 
 ---
 
-## 🎯 Fluxo de uso
+## Primeiro acesso
 
-```
-login.html
-   ↓ (login válido)
-aeps.html (lista de AEPs)
-   ↓ (clica em "Nova AEP" ou abre uma existente)
-index.html (app principal)
-   - Empresa → GES → Cronograma → Responsável
-   - Botão "Voltar às AEPs" na sidebar
-```
-
----
-
-## 🔐 Segurança
-
-- Senhas armazenadas como **SHA-256** (padrão de mercado)
-- Hash gerado pela **Web Crypto API nativa** do navegador
-- Mesmo input sempre produz mesmo hash em qualquer navegador
-- Sessão expira em 12 horas
-- Cada técnico vê apenas suas próprias AEPs
-- Admin tem visão completa do sistema
+- Usuário: **admin**
+- Senha: **admin123**
+- Troque a senha do admin imediatamente em **Admin**
+- Cadastre os técnicos — agora eles conseguem logar de qualquer dispositivo
 
 ---
 

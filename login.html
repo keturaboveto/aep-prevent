@@ -59,12 +59,25 @@ body{font-family:'Nunito Sans',system-ui,sans-serif;background:#F0F4FA;min-heigh
   <div class="note">
     Primeiro acesso: <code>admin</code> / <code>admin123</code><br>
     Funciona offline após o primeiro acesso.<br>
-    <a href="#" onclick="limparTudo();return false" style="color:#C0392B;font-size:10px;display:inline-block;margin-top:8px">Problemas para entrar? Limpar dados e recomeçar</a>
+    <a href="#" onclick="limparTudo();return false" style="color:#C0392B;font-size:10px;display:inline-block;margin-top:8px">Problemas para entrar? Limpar dados e recomeçar</a><br>
+    <a href="diagnostico.html" style="color:#185FA5;font-size:10px;display:inline-block;margin-top:6px">🔬 Testar conexão com Firebase</a>
   </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
 <script src="auth.js"></script>
 <script>
+// Aviso se o Firebase ainda não foi configurado
+window.addEventListener('load', () => {
+  if(!window.firebaseReady){
+    const err = document.getElementById('errMsg');
+    document.getElementById('errText').innerHTML = 'Firebase não configurado. Edite o arquivo <b>firebase-config.js</b> com as credenciais do seu projeto (veja FIREBASE-SETUP.md).';
+    err.classList.add('show');
+  }
+});
+
 async function doLogin(){
   const u = document.getElementById('username').value;
   const p = document.getElementById('password').value;
