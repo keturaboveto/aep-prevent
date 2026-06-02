@@ -59,54 +59,27 @@ body{font-family:'Nunito Sans',system-ui,sans-serif;background:#F0F4FA;min-heigh
   <div class="note">
     Primeiro acesso: <code>admin</code> / <code>admin123</code><br>
     Funciona offline após o primeiro acesso.<br>
-    <a href="#" onclick="limparTudo();return false" style="color:#C0392B;font-size:10px;display:inline-block;margin-top:8px">Problemas para entrar? Limpar dados e recomeçar</a><br>
-    <a href="diagnostico.html" style="color:#185FA5;font-size:10px;display:inline-block;margin-top:6px">🔬 Testar conexão com Firebase</a>
+    <a href="#" onclick="limparTudo();return false" style="color:#C0392B;font-size:10px;display:inline-block;margin-top:8px">Problemas para entrar? Limpar cache</a>
   </div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="firebase-config.js"></script>
+<script src="usuarios.js"></script>
 <script src="auth.js"></script>
 <script>
-// Aviso se o Firebase ainda não foi configurado
-window.addEventListener('load', () => {
-  if(!window.firebaseReady){
-    const err = document.getElementById('errMsg');
-    document.getElementById('errText').innerHTML = 'Firebase não configurado. Edite o arquivo <b>firebase-config.js</b> com as credenciais do seu projeto (veja FIREBASE-SETUP.md).';
-    err.classList.add('show');
-  }
-});
-
-async function doLogin(){
+function doLogin(){
   const u = document.getElementById('username').value;
   const p = document.getElementById('password').value;
-  const btn = document.getElementById('btnLogin');
   const err = document.getElementById('errMsg');
 
   err.classList.remove('show');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="ti ti-loader-2"></i> Entrando...';
 
-  try{
-    // Garante que admin existe (caso seja o primeiro login)
-    await AEPAuth.garantirAdmin();
-
-    const result = await AEPAuth.login(u, p);
-    if(result.ok){
-      AEPAuth.setSession(result.user, result.nome, result.role);
-      window.location.href = 'aeps.html';
-    } else {
-      document.getElementById('errText').textContent = result.msg;
-      err.classList.add('show');
-      btn.disabled = false;
-      btn.innerHTML = '<i class="ti ti-login"></i> Entrar';
-    }
-  }catch(e){
-    document.getElementById('errText').textContent = 'Erro: ' + e.message;
+  const result = AEPAuth.login(u, p);
+  if(result.ok){
+    AEPAuth.setSession(result.user, result.nome, result.role);
+    window.location.href = 'aeps.html';
+  } else {
+    document.getElementById('errText').textContent = result.msg;
     err.classList.add('show');
-    btn.disabled = false;
-    btn.innerHTML = '<i class="ti ti-login"></i> Entrar';
   }
 }
 
@@ -116,9 +89,9 @@ async function doLogin(){
   if(s) window.location.href = 'aeps.html';
 })();
 
-// Limpar tudo (resolver cache/dados antigos)
+// Limpar cache (resolver problemas de versão antiga)
 async function limparTudo(){
-  if(!confirm('Isso vai apagar TODOS os dados locais (usuários e AEPs) e limpar o cache. Use apenas se estiver com problemas de login. Continuar?')) return;
+  if(!confirm('Isso vai limpar o cache do app e recarregar. Continuar?')) return;
   try{
     if('serviceWorker' in navigator){
       const regs = await navigator.serviceWorker.getRegistrations();
@@ -128,9 +101,8 @@ async function limparTudo(){
       const keys = await caches.keys();
       for(const k of keys) await caches.delete(k);
     }
-    localStorage.clear();
     sessionStorage.clear();
-    alert('Dados limpos! A página vai recarregar. Use admin / admin123 para entrar.');
+    alert('Cache limpo! A página vai recarregar.');
     window.location.reload(true);
   }catch(e){ alert('Erro: '+e.message); }
 }

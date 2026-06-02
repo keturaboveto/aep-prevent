@@ -1,84 +1,93 @@
 # AEP NR-17 — Dr. Prevent Saúde Ocupacional
-## Versão com Firebase (login funciona em qualquer dispositivo)
+## Versão simples — login funciona em qualquer dispositivo, SEM configuração
 
 ---
 
-## ⚡ IMPORTANTE — Leia primeiro
+## ✅ Como funciona o login
 
-Esta versão usa **Firebase** para que o login funcione em **qualquer dispositivo**
-(celular, PC, tablet). Antes de usar, você precisa fazer uma configuração única
-de ~10 minutos.
-
-👉 **Siga o arquivo `FIREBASE-SETUP.md` passo a passo.**
-
-Sem essa configuração, o app mostrará "Firebase não configurado" e o login não funcionará.
+Os usuários ficam listados no arquivo **`usuarios.js`**. Como esse arquivo faz
+parte do app e é igual em todos os dispositivos, o login funciona em **qualquer
+aparelho** (celular, PC, tablet) automaticamente — sem Firebase, sem banco de
+dados, sem nenhuma configuração externa.
 
 ---
 
-## Por que Firebase?
+## 👤 Usuários que já vêm prontos
 
-Na versão anterior, os usuários ficavam salvos só no navegador onde foram criados
-(localStorage). Por isso o login funcionava no PC do admin, mas não no celular dos
-técnicos — cada dispositivo tinha sua própria "lista de usuários" isolada.
+| Usuário | Senha    | Perfil  |
+|---------|----------|---------|
+| admin   | admin123 | Admin   |
+| joao    | joao123  | Técnico |
+| maria   | maria123 | Técnico |
 
-Com o Firebase, os usuários ficam guardados **na nuvem**, acessíveis de qualquer
-aparelho. O login passa a funcionar em todos os dispositivos.
-
-- ✅ **Usuários/login** → nuvem (Firebase) — funciona em qualquer dispositivo
-- ✅ **AEPs preenchidas** → ficam no próprio dispositivo (como você prefere)
-- ✅ **Funciona offline** → depois do primeiro login, o app funciona sem internet em campo
-- ✅ **Custo zero** → plano gratuito do Firebase é mais que suficiente
+> Os usuários `joao` e `maria` são exemplos. Edite o arquivo `usuarios.js`
+> para colocar os nomes e senhas reais dos seus técnicos.
 
 ---
 
-## Ordem de instalação
+## ✏️ Como adicionar/editar/remover técnicos
 
-1. **Configure o Firebase** seguindo `FIREBASE-SETUP.md`
-2. **Cole as credenciais** no arquivo `firebase-config.js`
-3. **Suba todos os arquivos** ao GitHub (veja abaixo)
-4. **Ative o GitHub Pages**
-5. **Acesse e faça login** com admin / admin123
+Abra o arquivo **`usuarios.js`** (no GitHub, clique nele e depois no lápis ✏️).
+Cada técnico é uma linha assim:
+
+```javascript
+{ usuario: "joao", senha: "joao123", nome: "João Silva", tipo: "tecnico" },
+```
+
+- **Adicionar:** copie uma linha, cole abaixo e mude os dados
+- **Trocar senha:** mude o texto depois de `senha:`
+- **Remover:** apague a linha inteira
+- **Salvar:** role até o fim e clique em **Commit changes**
+
+Em ~1 minuto as mudanças valem em todos os dispositivos.
+
+A página **Admin** dentro do app mostra a lista atual e essas instruções de novo.
 
 ---
 
-## Subir ao GitHub Pages
+## 📋 Como publicar no GitHub Pages
 
 1. Crie um repositório público (ex.: `aep-prevent`)
-2. **Add file → Upload files**
-3. Arraste **TODOS os arquivos** desta pasta
-4. **Commit changes**
-5. **Settings → Pages → Branch: main → Save**
-6. Acesse `https://SEU_USUARIO.github.io/aep-prevent/`
+2. **Add file → Upload files** → arraste TODOS os arquivos desta pasta
+3. **Commit changes**
+4. **Settings → Pages → Branch: main → Save**
+5. Acesse `https://SEU_USUARIO.github.io/aep-prevent/`
+6. Login: **admin** / **admin123**
 
 ---
 
-## Arquivos do pacote
+## 📁 Arquivos do pacote
 
 | Arquivo | Função |
 |---------|--------|
-| `FIREBASE-SETUP.md` | **LEIA PRIMEIRO** — guia de configuração do Firebase |
-| `firebase-config.js` | **EDITE** — cole aqui as credenciais do seu Firebase |
+| `usuarios.js` | **Lista de usuários** — edite aqui para gerenciar acessos |
 | `login.html` | Tela de login |
 | `aeps.html` | Lista de AEPs (tela inicial) |
-| `admin.html` | Painel de administração de usuários |
+| `admin.html` | Lista de usuários + instruções |
 | `index.html` | App principal (cada AEP) |
-| `auth.js` | Autenticação (Firebase + SHA-256) |
-| `aeps.js` | Gerenciador de AEPs (local no dispositivo) |
-| `app.js` | Lógica do app + gerador de Word |
-| `logo-data.js` | Logo Dr. Prevent (base64) |
-| `logo-prevent.png` | Logo PNG |
-| `sw.js` | Service Worker (offline) |
-| `manifest.json` | PWA manifest |
+| `auth.js` | Login |
+| `aeps.js` | Gerenciador de AEPs |
+| `app.js` | Lógica + gerador de Word |
+| `logo-data.js` / `logo-prevent.png` | Logo Dr. Prevent |
+| `sw.js` / `manifest.json` | PWA (offline) |
 | `icon-192.png` / `icon-512.png` | Ícones |
 
 ---
 
-## Primeiro acesso
+## 🔒 Sobre segurança das senhas
 
-- Usuário: **admin**
-- Senha: **admin123**
-- Troque a senha do admin imediatamente em **Admin**
-- Cadastre os técnicos — agora eles conseguem logar de qualquer dispositivo
+Como o repositório do GitHub Pages é público, as senhas no `usuarios.js` ficam
+visíveis para quem procurar no código. Para um app interno com poucos usuários,
+isso é aceitável — mas use **senhas exclusivas deste app**, nunca repita senhas
+de e-mail, banco ou outros serviços importantes.
+
+---
+
+## 📌 Lembrete sobre as AEPs
+
+As AEPs preenchidas ficam salvas **no próprio dispositivo** onde foram criadas
+(cada técnico no seu celular). Isso é o ideal para o seu uso e mantém as fotos
+e dados sempre disponíveis offline.
 
 ---
 
